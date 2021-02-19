@@ -19,12 +19,21 @@ const express = require("express"),
 
 mongoose.Promise = global.Promise;
 
+// mongoose.connect(
+//     process.env.MONGODB_URI || "mongodb://localhost:27017/recipe_db",
+//     { useNewUrlParser: true, useFindAndModify: false,
+//       useUnifiedTopology: true
+//     }
+// );
+
 mongoose.connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/recipe_db",
+    process.env.MONGODB_URI || "mongodb+srv://recipe_app:abcdef1234@cluster0.21gh5.mongodb.net/recipe_app",
     { useNewUrlParser: true, useFindAndModify: false,
       useUnifiedTopology: true
     }
 );
+
+
 
 mongoose.set("useCreateIndex", true);
 
