@@ -15,6 +15,7 @@ const User = require("../models/user"),
     };
 
 module.exports = {
+    getUserParams,
     index: (req, res, next) => {
         User.find()
             .then(users => {

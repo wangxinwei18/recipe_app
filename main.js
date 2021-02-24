@@ -10,21 +10,23 @@ const express = require("express"),
     connectFlash = require("connect-flash"),
     expressValidator = require("express-validator"),
     passport = require("passport"),
-    errorController = require("./controllers/errorController"),
-    homeController = require("./controllers/homeController"),
-    subscribersController = require("./controllers/subscribersController"),
-    usersController = require("./controllers/usersController"),
-    coursesController = require("./controllers/coursesController"),
+    morgan = require("morgan"),
     User = require("./models/user");
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/recipe_db",
-    { useNewUrlParser: true, useFindAndModify: false,
-      useUnifiedTopology: true
-    }
+if (process.env.NODE_ENV === "test")
+    mongoose.connect(
+        "mongodb://localhost:27017/recipe_test_db",
+        { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true }
 );
+else
+    mongoose.connect(
+        process.env.MONGODB_URI || "mongodb://localhost:27017/recipe_db",
+        { useNewUrlParser: true, useFindAndModify: false,
+            useUnifiedTopology: true
+        }
+    );
 
 // mongoose.connect(
 //     process.env.MONGODB_URI || "mongodb+srv://recipe_app:abcdef1234@cluster0.21gh5.mongodb.net/recipe_app",
@@ -41,10 +43,12 @@ db.once("open", () => {
     console.log("Successfully connected to MongoDB using Mongoose!");
 });
 
-app.set("port", process.env.PORT || 3000);
+if (process.env.NODE_ENV === "test") app.set("port", 3001);
+else app.set("port", process.env.PORT || 3000);
+
 app.set("view engine", "ejs");
 app.set("token", process.env.TOKEN || "recipeT0k3n");
-
+app.use(morgan("combined"));
 app.use(express.static("public"));
 app.use(layouts);
 app.use(
@@ -90,7 +94,9 @@ app.use(expressValidator());
 app.use("/", router);
 
 const server = app.listen(app.get("port"), () => {
-    console.log(`Server running at http://localhost: ${app.get("port")}`);
+    console.log(`Server running at http://localhost:${app.get("port")}`);
 }),
     io = require("socket.io")(server);
 require("./controllers/chatController")(io);
+
+module.exports = app;
